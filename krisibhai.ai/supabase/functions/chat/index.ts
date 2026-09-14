@@ -1,3 +1,4 @@
+// @ts-expect-error Deno resolves URL imports at runtime; the editor's TypeScript server does not.
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -25,12 +26,14 @@ STYLE:
 
 Stay strictly on agriculture topics (crops, soil, fertiliser, pests, weather, irrigation, livestock, mandi prices, government schemes). Politely redirect off-topic questions back to farming.`;
 
-serve(async (req) => {
+serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
     const { messages, language } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const LOVABLE_API_KEY = (globalThis as typeof globalThis & {
+      Deno: { env: { get(name: string): string | undefined } };
+    }).Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
     // Inject language hint into the latest user message if provided

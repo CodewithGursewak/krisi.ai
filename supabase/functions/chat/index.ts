@@ -1,4 +1,11 @@
+// @ts-expect-error Deno resolves remote URL imports at runtime.
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+
+declare const Deno: {
+  env: {
+    get(name: string): string | undefined;
+  };
+};
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -25,7 +32,7 @@ STYLE:
 
 Stay strictly on agriculture topics (crops, soil, fertiliser, pests, weather, irrigation, livestock, mandi prices, government schemes). Politely redirect off-topic questions back to farming.`;
 
-serve(async (req) => {
+serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
