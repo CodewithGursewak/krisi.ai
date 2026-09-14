@@ -1,0 +1,1 @@
+# krisi.ai
